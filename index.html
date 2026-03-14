@@ -89,13 +89,16 @@
 
         .visitor-counter {
             margin-top: 30px;
-            padding: 10px;
-            font-size: 0.8rem;
+            padding: 15px;
+            font-size: 0.85rem;
             color: #94a3b8;
             border-top: 1px solid #334155;
-            display: inline-block;
+            display: block;
         }
-        #visit-count { color: var(--primary); font-weight: bold; }
+        .visitor-counter img {
+            margin-top: 8px;
+            filter: hue-rotate(180deg); /* بۆ ئەوەی ڕەنگی ژمارەکە لەگەڵ دیزاینەکە بگونجێت */
+        }
     </style>
 </head>
 <body>
@@ -115,7 +118,7 @@
                 <tr>
                     <th>ڕێکەوت</th>
                     <th>ڕۆژ</th>
-                    <th>کاتژمێری کار</th>
+                    <th style="text-align: center;">کاتژمێری کار</th>
                 </tr>
             </thead>
             <tbody id="monthBody"></tbody>
@@ -123,7 +126,8 @@
     </div>
 
     <div class="visitor-counter">
-        👁️ ژمارەی بینەری نوێ: <span id="visit-count">...</span> کەس
+        👁️ ژمارەی سەردانیکەران<br>
+        <img src="https://profile-counter.glitch.me/kadir-airport-shift-v3/count.svg" alt="Visitor Count">
     </div>
 
     <script>
@@ -146,13 +150,16 @@
             let s = new Date(baseDate); s.setHours(0,0,0,0);
             let diff = Math.floor((d - s) / (1000 * 60 * 60 * 24));
             let index = diff % 8; if (index < 0) index += 8;
+            
             let raw = rotation[index][group];
             let color = "off"; let text = raw;
+
             if (raw === "07:00-03:00") { text = "07:00 AM - 03:00 PM"; color = "day"; }
             else if (raw === "03:00-11:00") { text = "03:00 PM - 11:00 PM"; color = "evening"; }
             else if (raw === "11:00-07:00") { text = "11:00 PM - 07:00 AM"; color = "night"; }
             else if (raw === "OFF 24") { text = "پشووی ٢٤ کاتژمێری"; color = "off"; }
             else if (raw === "OFF") { text = "پشوو"; color = "off"; }
+            
             return { text, color, raw };
         }
 
@@ -161,6 +168,7 @@
             const today = new Date();
             const sel = new Date(selectedDate);
             if (today.toDateString() !== sel.toDateString()) return false;
+
             const hour = today.getHours();
             if (raw === "07:00-03:00" && hour >= 7 && hour < 15) return true;
             if (raw === "03:00-11:00" && hour >= 15 && hour < 23) return true;
@@ -174,13 +182,16 @@
             const dateInput = document.getElementById("date");
             const selectedDate = new Date(dateInput.value);
             if (isNaN(selectedDate)) return;
+
             document.getElementById("res-date").innerText = kurdishDays[selectedDate.getDay()] + " " + selectedDate.toLocaleDateString('ku-IQ');
+
             const allGroupsDiv = document.getElementById("allGroups");
             allGroupsDiv.innerHTML = "";
             ["A", "B", "C", "D"].forEach(g => {
                 let info = getShiftInfo(selectedDate, g);
                 let onDuty = isCurrentlyOnDuty(info.raw, selectedDate);
                 let activeClass = (g === currentGroup) ? "active-table" : "";
+                
                 allGroupsDiv.innerHTML += `
                     <div class="group-card ${activeClass}" onclick="currentGroup='${g}'; updateAll();">
                         ${onDuty ? '<div class="on-duty-badge">ئێستا لە دەوامە</div>' : ''}
@@ -190,6 +201,7 @@
                         </div>
                     </div>`;
             });
+
             updateTable(selectedDate);
         }
 
@@ -200,6 +212,7 @@
             let year = selectedDate.getFullYear(), month = selectedDate.getMonth();
             let daysInMonth = new Date(year, month + 1, 0).getDate();
             let today = new Date(); today.setHours(0,0,0,0);
+
             for (let i = 1; i <= daysInMonth; i++) {
                 let curDate = new Date(year, month, i);
                 let info = getShiftInfo(curDate, currentGroup);
@@ -212,20 +225,9 @@
             }
         }
 
-        async function updateCounter() {
-            try {
-                const response = await fetch('https://api.countapi.xyz/hit/kadir-airport-unique-v2/visits');
-                const data = await response.json();
-                document.getElementById('visit-count').innerText = data.value;
-            } catch (error) {
-                document.getElementById('visit-count').innerText = "١٠+";
-            }
-        }
-
         window.onload = () => {
             document.getElementById("date").value = new Date().toISOString().split("T")[0];
             updateAll();
-            updateCounter();
         };
     </script>
 </body>
