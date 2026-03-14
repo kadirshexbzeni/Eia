@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خشتەی شیفتاتی ئاسایش</title>
+    <style>
+        :root {
+            --primary: #38bdf8;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --text: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+        }
+
+        /* بەشی ڕێکەوتی سەرەوە */
+        .res-date { 
+            color: #ffffff; 
+            font-size: 1.3rem; /* گەورەتر کرا */
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); /* سێبەرێکی شین */
+            display: block;
+        }
+
+        h1 { color: var(--primary); font-size: 1.4rem; margin-bottom: 20px; }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        label { font-size: 1.1rem; font-weight: bold; display: block; margin-bottom: 8px; color: var(--primary); }
+
+        input, select {
+            width: 100%; padding: 12px; font-size: 1rem; margin-bottom: 15px;
+            border-radius: 10px; border: 2px solid #334155; background: #0f172a;
+            color: white; box-sizing: border-box; outline: none;
+        }
+
+        #result { margin-top: 15px; padding: 15px; background: rgba(15, 23, 42, 0.6); border-radius: 15px; }
+
+        .res-group { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: var(--text); }
+        
+        .shift-box {
+            font-size: 1.1rem; font-weight: 800; padding: 8px 12px;
+            border-radius: 10px; display: inline-block; direction: ltr; white-space: nowrap;
+        }
+
+        .day { color: var(--success); background: rgba(34, 197, 94, 0.1); }
+        .night { color: var(--primary); background: rgba(56, 189, 248, 0.1); }
+        .off { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+        .table-container { margin-top: 20px; overflow-x: auto; border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.85rem; }
+        th { background: #334155; color: var(--primary); padding: 12px 5px; }
+        td { padding: 10px 4px; border-bottom: 1px solid #334155; white-space: nowrap; }
+        .today-row { background: rgba(56, 189, 248, 0.15) !important; }
+    </style>
+</head>
+<body>
+
+    <h1>خشتەی ئەرکی ئاسایشی فڕۆکەخانە</h1>
+
+    <div class="container">
+        <label>📅 ڕێکەوت دیاری بکە</label>
+        <input type="date" id="date" onchange="updateAll()">
+
+        <label>👥 گرووپەکە هەڵبژێرە</label>
+        <select id="group" onchange="updateAll()">
+            <option value="A">گرووپی A</option>
+            <option value="B">گرووپی B</option>
+            <option value="C">گرووپی C</option>
+            <option value="D">گرووپی D</option>
+        </select>
+
+        <div id="result">
+            <span id="res-date" class="res-date">--</span> <div id="res-group" class="res-group">گرووپی -</div>
+            <div id="res-shift" class="shift-box">-- : --</div>
+        </div>
+    </div>
+
+    <h3 style="color:var(--primary); margin-top:25px;">خشتەی تەواوی مانگ</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ڕێکەوت</th>
+                    <th>ڕۆژ</th>
+                    <th>کاتژمێری کارکردن</th>
+                </tr>
+            </thead>
+            <tbody id="monthBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const rotation = [
+            {A:"OFF", B:"03:00 AM - 11:00 AM", C:"07:00 AM - 03:00 PM", D:"11:00 PM - 07:00 AM"},
+            {A:"03:00 AM - 11:00 AM", B:"11:00 PM - 07:00 AM", C:"07:00 AM - 03:00 PM", D:"OFF 24"},
+            {A:"03:00 AM - 11:00 AM", B:"11:00 PM - 07:00 AM", C:"OFF", D:"07:00 AM - 03:00 PM"},
+            {A:"11:00 PM - 07:00 AM", B:"OFF 24", C:"03:00 AM - 11:00 AM", D:"07:00 AM - 03:00 PM"},
+            {A:"11:00 PM - 07:00 AM", B:"07:00 AM - 03:00 PM", C:"03:00 AM - 11:00 AM", D:"OFF"},
+            {A:"OFF 24", B:"07:00 AM - 03:00 PM", C:"11:00 PM - 07:00 AM", D:"03:00 AM - 11:00 AM"},
+            {A:"07:00 AM - 03:00 PM", B:"OFF", C:"11:00 PM - 07:00 AM", D:"03:00 AM - 11:00 AM"},
+            {A:"07:00 AM - 03:00 PM", B:"03:00 AM - 11:00 AM", C:"OFF 24", D:"11:00 PM - 07:00 AM"}
+        ];
+
+        const kurdishDays = ["یەکشەممە", "دووشەممە", "سێشەممە", "چوارشەممە", "پێنجشەممە", "هەینی", "شەممە"];
+        const startDate = new Date("2025-01-01");
+
+        function getShiftInfo(date, group) {
+            let d = new Date(date); d.setHours(0,0,0,0);
+            let s = new Date(startDate); s.setHours(0,0,0,0);
+            let diff = Math.floor((d - s) / (1000 * 60 * 60 * 24));
+            let index = diff % 8; if (index < 0) index += 8;
+            let shiftStr = rotation[index][group];
+            let color = "day"; let text = shiftStr;
+            if (shiftStr.includes("11:00 PM")) color = "night";
+            if (shiftStr.includes("OFF")) { color = "off"; text = (shiftStr === "OFF") ? "پشوو" : "پشووی ٢٤ کاتژمێری"; }
+            return { text, color };
+        }
+
+        function updateAll() {
+            const dateInput = document.getElementById("date");
+            const group = document.getElementById("group").value;
+            const selectedDate = new Date(dateInput.value);
+            if (isNaN(selectedDate)) return;
+
+            // نوێکردنەوەی بەشی سەرەوە
+            document.getElementById("res-date").innerText = kurdishDays[selectedDate.getDay()] + " " + selectedDate.toLocaleDateString('ku-IQ');
+            document.getElementById("res-group").innerText = "گرووپی " + group;
+            
+            const info = getShiftInfo(selectedDate, group);
+            const resShift = document.getElementById("res-shift");
+            resShift.className = "shift-box " + info.color;
+            resShift.innerText = info.text;
+
+            // خشتەی مانگانە
+            const monthBody = document.getElementById("monthBody");
+            monthBody.innerHTML = "";
+            let year = selectedDate.getFullYear(), month = selectedDate.getMonth();
+            let daysInMonth = new Date(year, month + 1, 0).getDate();
+            let today = new Date(); today.setHours(0,0,0,0);
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                let curDate = new Date(year, month, i);
+                let loopInfo = getShiftInfo(curDate, group);
+                let isToday = (curDate.getTime() === today.getTime()) ? "today-row" : "";
+                monthBody.innerHTML += `<tr class="${isToday}">
+                    <td>${i}-${month + 1}</td>
+                    <td>${kurdishDays[curDate.getDay()]}</td>
+                    <td class="${loopInfo.color}" style="direction:ltr; font-weight:bold;">${loopInfo.text}</td>
+                </tr>`;
+            }
+        }
+
+        window.onload = () => {
+            document.getElementById("date").value = new Date().toISOString().split("T")[0];
+            updateAll();
+        };
+    </script>
+</body>
+</html>
