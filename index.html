@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>خشتەی شیفتاتی ئاسایش</title>
+    <title>خشتەی فەرمی ئاسایش</title>
     <style>
         :root {
             --primary: #38bdf8;
@@ -23,50 +23,64 @@
             margin: 0;
         }
 
-        /* بەشی ڕێکەوتی سەرەوە */
-        .res-date { 
-            color: #ffffff; 
-            font-size: 1.3rem; /* گەورەتر کرا */
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); /* سێبەرێکی شین */
-            display: block;
-        }
-
-        h1 { color: var(--primary); font-size: 1.4rem; margin-bottom: 20px; }
+        h1 { color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; }
 
         .container {
             max-width: 400px;
             margin: 0 auto;
             background: var(--card-bg);
-            padding: 20px;
+            padding: 15px;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        label { font-size: 1.1rem; font-weight: bold; display: block; margin-bottom: 8px; color: var(--primary); }
-
-        input, select {
-            width: 100%; padding: 12px; font-size: 1rem; margin-bottom: 15px;
+        input {
+            width: 100%; padding: 12px; font-size: 1.1rem; margin-bottom: 15px;
             border-radius: 10px; border: 2px solid #334155; background: #0f172a;
-            color: white; box-sizing: border-box; outline: none;
+            color: white; text-align: center; outline: none;
         }
 
-        #result { margin-top: 15px; padding: 15px; background: rgba(15, 23, 42, 0.6); border-radius: 15px; }
-
-        .res-group { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: var(--text); }
-        
-        .shift-box {
-            font-size: 1.1rem; font-weight: 800; padding: 8px 12px;
-            border-radius: 10px; display: inline-block; direction: ltr; white-space: nowrap;
+        .res-date-top { 
+            color: #ffffff; font-size: 1.2rem; font-weight: bold; 
+            margin-bottom: 15px; display: block;
         }
 
-        .day { color: var(--success); background: rgba(34, 197, 94, 0.1); }
-        .night { color: var(--primary); background: rgba(56, 189, 248, 0.1); }
-        .off { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .all-groups-status { display: flex; flex-direction: column; gap: 10px; }
 
-        .table-container { margin-top: 20px; overflow-x: auto; border-radius: 12px; }
+        .group-card {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 12px 15px;
+            border-radius: 15px;
+            border: 1px solid #334155;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .group-card.active-table { border-color: var(--primary); background: rgba(56, 189, 248, 0.1); }
+
+        .on-duty-badge {
+            background: var(--success);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .group-header { display: flex; justify-content: space-between; align-items: center; }
+        .group-name { font-weight: bold; color: var(--primary); }
+        .shift-text { font-size: 0.95rem; font-weight: bold; direction: ltr; }
+
+        .day { color: #fbbf24; } /* ڕەنگی زەرد بۆ ڕۆژ */
+        .evening { color: #22c55e; } /* ڕەنگی سەوز بۆ ئێوارە */
+        .night { color: #38bdf8; } /* ڕەنگی شین بۆ شەو */
+        .off { color: var(--danger); }
+
+        .table-container { margin-top: 25px; overflow-x: auto; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.85rem; }
         th { background: #334155; color: var(--primary); padding: 12px 5px; }
         td { padding: 10px 4px; border-bottom: 1px solid #334155; white-space: nowrap; }
@@ -75,34 +89,22 @@
 </head>
 <body>
 
-    <h1>خشتەی ئەرکی ئاسایشی فڕۆکەخانە</h1>
+    <h1>ئاسایشی فڕۆکەخانەی هەولێر</h1>
 
     <div class="container">
-        <label>📅 ڕێکەوت دیاری بکە</label>
         <input type="date" id="date" onchange="updateAll()">
-
-        <label>👥 گرووپەکە هەڵبژێرە</label>
-        <select id="group" onchange="updateAll()">
-            <option value="A">گرووپی A</option>
-            <option value="B">گرووپی B</option>
-            <option value="C">گرووپی C</option>
-            <option value="D">گرووپی D</option>
-        </select>
-
-        <div id="result">
-            <span id="res-date" class="res-date">--</span> <div id="res-group" class="res-group">گرووپی -</div>
-            <div id="res-shift" class="shift-box">-- : --</div>
-        </div>
+        <span id="res-date" class="res-date-top">--</span>
+        <div class="all-groups-status" id="allGroups"></div>
     </div>
 
-    <h3 style="color:var(--primary); margin-top:25px;">خشتەی تەواوی مانگ</h3>
+    <h3 id="tableTitle" style="color:var(--primary); margin-top:25px; font-size: 1rem;">خشتەی مانگانە</h3>
     <div class="table-container">
         <table>
             <thead>
                 <tr>
                     <th>ڕێکەوت</th>
                     <th>ڕۆژ</th>
-                    <th>کاتژمێری کارکردن</th>
+                    <th>کاتژمێری کار</th>
                 </tr>
             </thead>
             <tbody id="monthBody"></tbody>
@@ -110,48 +112,79 @@
     </div>
 
     <script>
+        // ڕیزبەندی ورد بەپێی وێنەی خشتەکە کە ناردی (٨ ڕۆژی جیاواز)
         const rotation = [
-            {A:"OFF", B:"03:00 AM - 11:00 AM", C:"07:00 AM - 03:00 PM", D:"11:00 PM - 07:00 AM"},
-            {A:"03:00 AM - 11:00 AM", B:"11:00 PM - 07:00 AM", C:"07:00 AM - 03:00 PM", D:"OFF 24"},
-            {A:"03:00 AM - 11:00 AM", B:"11:00 PM - 07:00 AM", C:"OFF", D:"07:00 AM - 03:00 PM"},
-            {A:"11:00 PM - 07:00 AM", B:"OFF 24", C:"03:00 AM - 11:00 AM", D:"07:00 AM - 03:00 PM"},
-            {A:"11:00 PM - 07:00 AM", B:"07:00 AM - 03:00 PM", C:"03:00 AM - 11:00 AM", D:"OFF"},
-            {A:"OFF 24", B:"07:00 AM - 03:00 PM", C:"11:00 PM - 07:00 AM", D:"03:00 AM - 11:00 AM"},
-            {A:"07:00 AM - 03:00 PM", B:"OFF", C:"11:00 PM - 07:00 AM", D:"03:00 AM - 11:00 AM"},
-            {A:"07:00 AM - 03:00 PM", B:"03:00 AM - 11:00 AM", C:"OFF 24", D:"11:00 PM - 07:00 AM"}
+            { A: "OFF 24", B: "07:00-03:00", C: "11:00-07:00", D: "03:00-11:00" }, // ڕۆژی ١ (شەممە 14-3)
+            { A: "07:00-03:00", B: "OFF", C: "11:00-07:00", D: "03:00-11:00" },      // ڕۆژی ٢
+            { A: "07:00-03:00", B: "03:00-11:00", C: "OFF 24", D: "11:00-07:00" }, // ڕۆژی ٣
+            { A: "OFF", B: "03:00-11:00", C: "07:00-03:00", D: "11:00-07:00" },      // ڕۆژی ٤
+            { A: "03:00-11:00", B: "11:00-07:00", C: "07:00-03:00", D: "OFF 24" }, // ڕۆژی ٥
+            { A: "03:00-11:00", B: "11:00-07:00", C: "OFF", D: "07:00-03:00" },      // ڕۆژی ٦
+            { A: "11:00-07:00", B: "OFF 24", C: "03:00-11:00", D: "07:00-03:00" }, // ڕۆژی ٧
+            { A: "11:00-07:00", B: "07:00-03:00", C: "03:00-11:00", D: "OFF" }       // ڕۆژی ٨
         ];
 
         const kurdishDays = ["یەکشەممە", "دووشەممە", "سێشەممە", "چوارشەممە", "پێنجشەممە", "هەینی", "شەممە"];
-        const startDate = new Date("2025-01-01");
+        // بەپێی خشتەکە شەممە 14-3 ڕۆژی یەکەمی ئەم ڕیزبەندییەیە
+        const baseDate = new Date("2026-03-14"); 
 
         function getShiftInfo(date, group) {
             let d = new Date(date); d.setHours(0,0,0,0);
-            let s = new Date(startDate); s.setHours(0,0,0,0);
+            let s = new Date(baseDate); s.setHours(0,0,0,0);
             let diff = Math.floor((d - s) / (1000 * 60 * 60 * 24));
             let index = diff % 8; if (index < 0) index += 8;
-            let shiftStr = rotation[index][group];
-            let color = "day"; let text = shiftStr;
-            if (shiftStr.includes("11:00 PM")) color = "night";
-            if (shiftStr.includes("OFF")) { color = "off"; text = (shiftStr === "OFF") ? "پشوو" : "پشووی ٢٤ کاتژمێری"; }
-            return { text, color };
+            
+            let raw = rotation[index][group];
+            let color = "off"; let text = raw;
+
+            if (raw === "07:00-03:00") { text = "07:00 AM - 03:00 PM"; color = "day"; }
+            else if (raw === "03:00-11:00") { text = "03:00 PM - 11:00 PM"; color = "evening"; }
+            else if (raw === "11:00-07:00") { text = "11:00 PM - 07:00 AM"; color = "night"; }
+            else if (raw === "OFF 24") { text = "پشووی ٢٤ کاتژمێری"; color = "off"; }
+            else if (raw === "OFF") { text = "پشوو"; color = "off"; }
+            
+            return { text, color, raw };
         }
 
+        function isCurrentlyOnDuty(raw) {
+            if (raw.includes("OFF")) return false;
+            const hour = new Date().getHours();
+            if (raw === "07:00-03:00" && hour >= 7 && hour < 15) return true;
+            if (raw === "03:00-11:00" && hour >= 15 && hour < 23) return true;
+            if (raw === "11:00-07:00" && (hour >= 23 || hour < 7)) return true;
+            return false;
+        }
+
+        let currentGroup = "A";
+
         function updateAll() {
-            const dateInput = document.getElementById("date");
-            const group = document.getElementById("group").value;
-            const selectedDate = new Date(dateInput.value);
+            const selectedDate = new Date(document.getElementById("date").value);
             if (isNaN(selectedDate)) return;
 
-            // نوێکردنەوەی بەشی سەرەوە
             document.getElementById("res-date").innerText = kurdishDays[selectedDate.getDay()] + " " + selectedDate.toLocaleDateString('ku-IQ');
-            document.getElementById("res-group").innerText = "گرووپی " + group;
-            
-            const info = getShiftInfo(selectedDate, group);
-            const resShift = document.getElementById("res-shift");
-            resShift.className = "shift-box " + info.color;
-            resShift.innerText = info.text;
 
-            // خشتەی مانگانە
+            const allGroupsDiv = document.getElementById("allGroups");
+            allGroupsDiv.innerHTML = "";
+            ["A", "B", "C", "D"].forEach(g => {
+                let info = getShiftInfo(selectedDate, g);
+                let onDuty = isCurrentlyOnDuty(info.raw);
+                let activeClass = (g === currentGroup) ? "active-table" : "";
+                
+                allGroupsDiv.innerHTML += `
+                    <div class="group-card ${activeClass}" onclick="currentGroup='${g}'; updateAll();">
+                        ${onDuty ? '<div class="on-duty-badge">ئێستا لە دەوامە</div>' : ''}
+                        <div class="group-header">
+                            <span class="group-name">گرووپی ${g}</span>
+                            <span class="shift-text ${info.color}">${info.text}</span>
+                        </div>
+                    </div>`;
+            });
+
+            updateTable(selectedDate);
+        }
+
+        function updateTable(selectedDate) {
+            document.getElementById("tableTitle").innerText = `خشتەی مانگانەی (گرووپی ${currentGroup})`;
             const monthBody = document.getElementById("monthBody");
             monthBody.innerHTML = "";
             let year = selectedDate.getFullYear(), month = selectedDate.getMonth();
@@ -160,12 +193,12 @@
 
             for (let i = 1; i <= daysInMonth; i++) {
                 let curDate = new Date(year, month, i);
-                let loopInfo = getShiftInfo(curDate, group);
+                let info = getShiftInfo(curDate, currentGroup);
                 let isToday = (curDate.getTime() === today.getTime()) ? "today-row" : "";
                 monthBody.innerHTML += `<tr class="${isToday}">
                     <td>${i}-${month + 1}</td>
                     <td>${kurdishDays[curDate.getDay()]}</td>
-                    <td class="${loopInfo.color}" style="direction:ltr; font-weight:bold;">${loopInfo.text}</td>
+                    <td class="${info.color}" style="direction:ltr; font-weight:bold;">${info.text}</td>
                 </tr>`;
             }
         }
