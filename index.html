@@ -83,8 +83,8 @@
 
         .table-container { margin-top: 25px; overflow-x: auto; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.85rem; }
-        th { background: #334155; color: var(--primary); padding: 12px 5px; }
-        td { padding: 10px 4px; border-bottom: 1px solid #334155; white-space: nowrap; }
+        th { background: #334155; color: var(--primary); padding: 12px 5px; text-align: center; }
+        td { padding: 10px 4px; border-bottom: 1px solid #334155; white-space: nowrap; text-align: center; }
         .today-row { background: rgba(56, 189, 248, 0.15) !important; }
 
         .visitor-counter {
@@ -207,7 +207,7 @@
                 monthBody.innerHTML += `<tr class="${isToday}">
                     <td>${i}-${month + 1}</td>
                     <td>${kurdishDays[curDate.getDay()]}</td>
-                    <td class="${info.color}" style="direction:ltr; font-weight:bold;">${info.text}</td>
+                    <td class="${info.color}" style="direction:ltr; font-weight:bold; text-align:center;">${info.text}</td>
                 </tr>`;
             }
         }
