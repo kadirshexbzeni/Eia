@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>خشتەی کارکردن</title>
+    <title>خشتەی فەرمی کارکردن</title>
     <style>
         :root {
             --primary: #38bdf8;
@@ -165,11 +165,13 @@
 
         function isCurrentlyOnDuty(raw, selectedDate) {
             if (raw.includes("OFF")) return false;
-            const today = new Date();
+            const now = new Date();
             const sel = new Date(selectedDate);
-            if (today.toDateString() !== sel.toDateString()) return false;
+            
+            // بەراوردکردنی ڕێکەوتی هەڵبژێردراو لەگەڵ ڕێکەوتی ئێستا
+            if (now.toDateString() !== sel.toDateString()) return false;
 
-            const hour = today.getHours();
+            const hour = now.getHours();
             if (raw === "07:00-03:00" && hour >= 7 && hour < 15) return true;
             if (raw === "03:00-11:00" && hour >= 15 && hour < 23) return true;
             if (raw === "11:00-07:00" && (hour >= 23 || hour < 7)) return true;
@@ -226,7 +228,12 @@
         }
 
         window.onload = () => {
-            document.getElementById("date").value = new Date().toISOString().split("T")[0];
+            // وەرگرتنی کاتی ئێستا بەپێی ناوچەی کاتی (Timezone)
+            const today = new Date();
+            const offset = today.getTimezoneOffset() * 60000;
+            const localISODate = new Date(today.getTime() - offset).toISOString().split("T")[0];
+            
+            document.getElementById("date").value = localISODate;
             updateAll();
         };
     </script>
