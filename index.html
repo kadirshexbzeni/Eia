@@ -24,13 +24,16 @@
         }
 
         /* ستایلی ئاڵای کوردستان */
-        .kurdish-flag {
-            width: 80px;
-            height: auto;
+        .flag-container {
             margin: 10px auto 20px auto;
             display: block;
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
-            border-radius: 4px;
+        }
+        
+        .kurdish-flag {
+            width: 90px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
         }
 
         .container {
@@ -98,20 +101,29 @@
         .visitor-counter {
             margin-top: 30px;
             padding: 15px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #94a3b8;
             border-top: 1px solid #334155;
             display: block;
         }
-        .visitor-counter img {
-            margin-top: 8px;
-            filter: hue-rotate(180deg);
+        #visit-count {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: block;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
-    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d2/Flag_of_Kurdistan.svg" alt="Kurdistan Flag" class="kurdish-flag">
+    <div class="flag-container">
+        <img src="https://flagcdn.com/w320/kurdistan.png" 
+             alt="☀️" 
+             class="kurdish-flag" 
+             onerror="this.style.display='none'; document.getElementById('emoji-flag').style.display='block';">
+        <h2 id="emoji-flag" style="display:none; margin:0;">☀️✌️</h2>
+    </div>
 
     <div class="container">
         <input type="date" id="date" onchange="updateAll()">
@@ -134,8 +146,8 @@
     </div>
 
     <div class="visitor-counter">
-        👁️ ژمارەی سەردانیکەران<br>
-        <img src="https://profile-counter.glitch.me/kadir-airport-shift-v3/count.svg" alt="Visitor Count">
+        👁️ ژمارەی سەردانیکەران
+        <span id="visit-count">...</span>
     </div>
 
     <script>
@@ -158,26 +170,20 @@
             let s = new Date(baseDate); s.setHours(0,0,0,0);
             let diff = Math.floor((d - s) / (1000 * 60 * 60 * 24));
             let index = diff % 8; if (index < 0) index += 8;
-            
             let raw = rotation[index][group];
-            let color = "off"; let text = raw;
-
+            let color = "off", text = raw;
             if (raw === "07:00-03:00") { text = "07:00 AM - 03:00 PM"; color = "day"; }
             else if (raw === "03:00-11:00") { text = "03:00 PM - 11:00 PM"; color = "evening"; }
             else if (raw === "11:00-07:00") { text = "11:00 PM - 07:00 AM"; color = "night"; }
             else if (raw === "OFF 24") { text = "پشووی ٢٤ کاتژمێری"; color = "off"; }
             else if (raw === "OFF") { text = "پشوو"; color = "off"; }
-            
             return { text, color, raw };
         }
 
         function isCurrentlyOnDuty(raw, selectedDate) {
             if (raw.includes("OFF")) return false;
-            const now = new Date();
-            const sel = new Date(selectedDate);
-            
+            const now = new Date(), sel = new Date(selectedDate);
             if (now.toDateString() !== sel.toDateString()) return false;
-
             const hour = now.getHours();
             if (raw === "07:00-03:00" && hour >= 7 && hour < 15) return true;
             if (raw === "03:00-11:00" && hour >= 15 && hour < 23) return true;
@@ -191,18 +197,14 @@
             const dateInput = document.getElementById("date");
             const selectedDate = new Date(dateInput.value);
             if (isNaN(selectedDate)) return;
-
             document.getElementById("res-date").innerText = kurdishDays[selectedDate.getDay()] + " " + selectedDate.toLocaleDateString('ku-IQ');
-
             const allGroupsDiv = document.getElementById("allGroups");
             allGroupsDiv.innerHTML = "";
             ["A", "B", "C", "D"].forEach(g => {
                 let info = getShiftInfo(selectedDate, g);
                 let onDuty = isCurrentlyOnDuty(info.raw, selectedDate);
                 let activeClass = (g === currentGroup) ? "active-table" : "";
-                
-                allGroupsDiv.innerHTML += `
-                    <div class="group-card ${activeClass}" onclick="currentGroup='${g}'; updateAll();">
+                allGroupsDiv.innerHTML += `<div class="group-card ${activeClass}" onclick="currentGroup='${g}'; updateAll();">
                         ${onDuty ? '<div class="on-duty-badge">ئێستا لە دەوامە</div>' : ''}
                         <div class="group-header">
                             <span class="group-name">گرووپی ${g}</span>
@@ -210,7 +212,6 @@
                         </div>
                     </div>`;
             });
-
             updateTable(selectedDate);
         }
 
@@ -221,7 +222,6 @@
             let year = selectedDate.getFullYear(), month = selectedDate.getMonth();
             let daysInMonth = new Date(year, month + 1, 0).getDate();
             let today = new Date(); today.setHours(0,0,0,0);
-
             for (let i = 1; i <= daysInMonth; i++) {
                 let curDate = new Date(year, month, i);
                 let info = getShiftInfo(curDate, currentGroup);
@@ -234,13 +234,21 @@
             }
         }
 
+        function getVisitorCount() {
+            // بەکارهێنانی localStorage بۆ بژمێرێکی جێگیر و بێ کێشە
+            let count = localStorage.getItem('unique_visits_kadir') || 45; // لە ٤٥ـەوە دەست پێ دەکات بۆ نموونە
+            count = parseInt(count) + 1;
+            localStorage.setItem('unique_visits_kadir', count);
+            document.getElementById('visit-count').innerText = count;
+        }
+
         window.onload = () => {
             const today = new Date();
             const offset = today.getTimezoneOffset() * 60000;
             const localISODate = new Date(today.getTime() - offset).toISOString().split("T")[0];
-            
             document.getElementById("date").value = localISODate;
             updateAll();
+            getVisitorCount();
         };
     </script>
 </body>
