@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>خشتەی کارکردن</title>
     <style>
         :root {
             --primary: #38bdf8;
@@ -23,11 +23,10 @@
             margin: 0;
         }
 
-        h1 { color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; }
-
+        /* لادانی مارجینی زیادە چونکە هێدینگمان نەما */
         .container {
             max-width: 400px;
-            margin: 0 auto;
+            margin: 20px auto;
             background: var(--card-bg);
             padding: 15px;
             border-radius: 20px;
@@ -103,8 +102,6 @@
 </head>
 <body>
 
-    <h1>خشتەی فەرمی کارکردن</h1>
-
     <div class="container">
         <input type="date" id="date" onchange="updateAll()">
         <span id="res-date" class="res-date-top">--</span>
@@ -168,7 +165,6 @@
             const now = new Date();
             const sel = new Date(selectedDate);
             
-            // بەراوردکردنی ڕێکەوتی هەڵبژێردراو لەگەڵ ڕێکەوتی ئێستا
             if (now.toDateString() !== sel.toDateString()) return false;
 
             const hour = now.getHours();
@@ -228,7 +224,6 @@
         }
 
         window.onload = () => {
-            // وەرگرتنی کاتی ئێستا بەپێی ناوچەی کاتی (Timezone)
             const today = new Date();
             const offset = today.getTimezoneOffset() * 60000;
             const localISODate = new Date(today.getTime() - offset).toISOString().split("T")[0];
