@@ -19,16 +19,17 @@
             background-color: var(--bg);
             color: var(--text);
             text-align: center;
-            padding: 5px 15px; /* کەمکردنەوەی پادینگی سەرەوە */
+            padding: 15px;
             margin: 0;
         }
 
-        /* بچووککردنەوەی مەودای بانەرەکە */
+        /* وێنەکە بەبێ هیچ چوارچێوە و سێبەرێک */
         .icon-container {
             width: 80px;
             height: 62px;
-            margin: 5px auto 10px auto; /* کەمکردنەوەی مەودای خوارەوەی وێنەکە */
+            margin: 10px auto 20px auto;
             overflow: hidden;
+            border: none; /* لادانی چوارچێوەکە */
         }
         
         .main-icon {
@@ -42,31 +43,32 @@
             max-width: 400px;
             margin: 0 auto;
             background: var(--card-bg);
-            padding: 12px; /* کەمکردنەوەی ناوپۆش */
-            border-radius: 20px;
+            padding: 15px;
+            border-radius: 25px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
         input {
-            width: 100%; padding: 10px; font-size: 1rem; margin-bottom: 10px;
-            border-radius: 10px; border: 2px solid #334155; background: #0f172a;
+            width: 100%; padding: 12px; font-size: 1.1rem; margin-bottom: 15px;
+            border-radius: 12px; border: 2px solid #334155; background: #0f172a;
             color: white; text-align: center; outline: none;
         }
 
         .res-date-top { 
-            color: #ffffff; font-size: 1.1rem; font-weight: bold; 
-            margin-bottom: 10px; display: block;
+            color: #ffffff; font-size: 1.2rem; font-weight: bold; 
+            margin-bottom: 15px; display: block;
         }
 
-        .all-groups-status { display: flex; flex-direction: column; gap: 8px; }
+        .all-groups-status { display: flex; flex-direction: column; gap: 10px; }
 
         .group-card {
             background: rgba(15, 23, 42, 0.7);
-            padding: 10px 15px;
-            border-radius: 15px;
+            padding: 12px 15px;
+            border-radius: 18px;
             border: 1px solid #334155;
             cursor: pointer;
             position: relative;
+            transition: 0.2s;
         }
 
         .group-card.active-table { border-color: var(--primary); background: rgba(56, 189, 248, 0.1); }
@@ -74,38 +76,45 @@
         .on-duty-badge {
             background: var(--success);
             color: white;
-            font-size: 0.65rem;
-            padding: 1px 6px;
-            border-radius: 8px;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
             position: absolute;
-            top: -6px;
+            top: -8px;
             left: 10px;
+            box-shadow: 0 0 8px var(--success);
             font-weight: bold;
         }
 
         .group-header { display: flex; justify-content: space-between; align-items: center; }
-        .group-name { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
-        .shift-text { font-size: 0.85rem; font-weight: bold; direction: ltr; }
+        .group-name { font-weight: bold; color: var(--primary); }
+        .shift-text { font-size: 0.95rem; font-weight: bold; direction: ltr; }
 
         .day { color: #fbbf24; }
         .evening { color: #22c55e; }
         .night { color: #38bdf8; }
         .off { color: var(--danger); }
 
-        /* ڕێکخستنی خشتەکە بۆ ئەوەی بێتە سەرەوە */
-        .table-container { margin-top: 15px; overflow-x: auto; border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.8rem; }
-        th { background: #334155; color: var(--primary); padding: 8px 4px; }
-        td { padding: 8px 4px; border-bottom: 1px solid #334155; }
-        
-        #tableTitle { margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; color: var(--primary); }
+        .table-container { margin-top: 25px; overflow-x: auto; border-radius: 15px; }
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.85rem; }
+        th { background: #334155; color: var(--primary); padding: 12px 5px; text-align: center; }
+        td { padding: 10px 4px; border-bottom: 1px solid #334155; white-space: nowrap; text-align: center; }
+        .today-row { background: rgba(56, 189, 248, 0.15) !important; }
 
         .visitor-counter {
-            margin-top: 20px;
-            padding: 10px;
-            font-size: 0.8rem;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 0.9rem;
             color: #94a3b8;
             border-top: 1px solid #334155;
+            display: block;
+        }
+        #visit-count {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: block;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -123,14 +132,14 @@
         <div class="all-groups-status" id="allGroups"></div>
     </div>
 
-    <h3 id="tableTitle">خشتەی مانگانە</h3>
+    <h3 id="tableTitle" style="color:var(--primary); margin-top:25px; font-size: 1rem;">خشتەی مانگانە</h3>
     <div class="table-container">
         <table>
             <thead>
                 <tr>
                     <th>ڕێکەوت</th>
                     <th>ڕۆژ</th>
-                    <th>کاتژمێر</th>
+                    <th style="text-align: center;">کاتژمێری کار</th>
                 </tr>
             </thead>
             <tbody id="monthBody"></tbody>
@@ -138,7 +147,8 @@
     </div>
 
     <div class="visitor-counter">
-        👁️ سەردانیکەران: <span id="visit-count" style="color:var(--primary); font-weight:bold;">...</span>
+        👁️ ژمارەی سەردانیکەران
+        <span id="visit-count">...</span>
     </div>
 
     <script>
@@ -163,10 +173,10 @@
             let index = diff % 8; if (index < 0) index += 8;
             let raw = rotation[index][group];
             let color = "off", text = raw;
-            if (raw === "07:00-03:00") { text = "07:00-03:00"; color = "day"; }
-            else if (raw === "03:00-11:00") { text = "03:00-11:00"; color = "evening"; }
-            else if (raw === "11:00-07:00") { text = "11:00-07:00"; color = "night"; }
-            else if (raw === "OFF 24") { text = "پشوو 24"; color = "off"; }
+            if (raw === "07:00-03:00") { text = "07:00 AM - 03:00 PM"; color = "day"; }
+            else if (raw === "03:00-11:00") { text = "03:00 PM - 11:00 PM"; color = "evening"; }
+            else if (raw === "11:00-07:00") { text = "11:00 PM - 07:00 AM"; color = "night"; }
+            else if (raw === "OFF 24") { text = "پشووی ٢٤ کاتژمێری"; color = "off"; }
             else if (raw === "OFF") { text = "پشوو"; color = "off"; }
             return { text, color, raw };
         }
@@ -196,7 +206,7 @@
                 let onDuty = isCurrentlyOnDuty(info.raw, selectedDate);
                 let activeClass = (g === currentGroup) ? "active-table" : "";
                 allGroupsDiv.innerHTML += `<div class="group-card ${activeClass}" onclick="currentGroup='${g}'; updateAll();">
-                        ${onDuty ? '<div class="on-duty-badge">ئێستا</div>' : ''}
+                        ${onDuty ? '<div class="on-duty-badge">ئێستا لە دەوامە</div>' : ''}
                         <div class="group-header">
                             <span class="group-name">گرووپی ${g}</span>
                             <span class="shift-text ${info.color}">${info.text}</span>
@@ -207,7 +217,7 @@
         }
 
         function updateTable(selectedDate) {
-            document.getElementById("tableTitle").innerText = `خشتەی (گرووپی ${currentGroup})`;
+            document.getElementById("tableTitle").innerText = `خشتەی مانگانەی (گرووپی ${currentGroup})`;
             const monthBody = document.getElementById("monthBody");
             monthBody.innerHTML = "";
             let year = selectedDate.getFullYear(), month = selectedDate.getMonth();
@@ -220,7 +230,7 @@
                 monthBody.innerHTML += `<tr class="${isToday}">
                     <td>${i}-${month + 1}</td>
                     <td>${kurdishDays[curDate.getDay()]}</td>
-                    <td class="${info.color}" style="direction:ltr; font-weight:bold;">${info.text}</td>
+                    <td class="${info.color}" style="direction:ltr; font-weight:bold; text-align:center;">${info.text}</td>
                 </tr>`;
             }
         }
