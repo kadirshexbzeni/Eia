@@ -23,18 +23,19 @@
             margin: 0;
         }
 
-        /* ستایلی بانەرە نوێیەکە */
-        .banner-container {
-            max-width: 400px;
+        /* وێنەکە بەبێ هیچ چوارچێوە و سێبەرێک */
+        .icon-container {
+            width: 80px;
+            height: 62px;
             margin: 10px auto 20px auto;
-            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: none; /* لادانی چوارچێوەکە */
         }
         
-        .main-banner {
+        .main-icon {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: fill;
             display: block;
         }
 
@@ -43,13 +44,13 @@
             margin: 0 auto;
             background: var(--card-bg);
             padding: 15px;
-            border-radius: 20px;
+            border-radius: 25px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
         input {
             width: 100%; padding: 12px; font-size: 1.1rem; margin-bottom: 15px;
-            border-radius: 10px; border: 2px solid #334155; background: #0f172a;
+            border-radius: 12px; border: 2px solid #334155; background: #0f172a;
             color: white; text-align: center; outline: none;
         }
 
@@ -63,7 +64,7 @@
         .group-card {
             background: rgba(15, 23, 42, 0.7);
             padding: 12px 15px;
-            border-radius: 15px;
+            border-radius: 18px;
             border: 1px solid #334155;
             cursor: pointer;
             position: relative;
@@ -94,7 +95,7 @@
         .night { color: #38bdf8; }
         .off { color: var(--danger); }
 
-        .table-container { margin-top: 25px; overflow-x: auto; border-radius: 12px; }
+        .table-container { margin-top: 25px; overflow-x: auto; border-radius: 15px; }
         table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.85rem; }
         th { background: #334155; color: var(--primary); padding: 12px 5px; text-align: center; }
         td { padding: 10px 4px; border-bottom: 1px solid #334155; white-space: nowrap; text-align: center; }
@@ -119,10 +120,10 @@
 </head>
 <body>
 
-    <div class="banner-container">
+    <div class="icon-container">
         <img src="https://raw.githubusercontent.com/kadirshexbzeni/schedule/refs/heads/main/IMG_4316.png" 
-             alt="Banner" 
-             class="main-banner">
+             alt="Logo" 
+             class="main-icon">
     </div>
 
     <div class="container">
@@ -235,7 +236,7 @@
         }
 
         function getVisitorCount() {
-            let count = localStorage.getItem('unique_visits_kadir') || 1;
+            let count = localStorage.getItem('unique_visits_kadir') || 0;
             count = parseInt(count) + 1;
             localStorage.setItem('unique_visits_kadir', count);
             document.getElementById('visit-count').innerText = count;
