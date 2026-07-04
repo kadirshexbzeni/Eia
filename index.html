@@ -60,7 +60,7 @@
             color: white; 
             text-align: center; 
             outline: none;
-            box-sizing: border-box; /* بۆ ئەوەی قەبارەی خانەکە لە چوارچێوە دەرنەچێت */
+            box-sizing: border-box;
         }
 
         /* جوانکاری و هێنانە ناوەڕاستی ڕێکەوت */
@@ -93,7 +93,7 @@
 
         .group-card.active-table { border-color: var(--primary); background: rgba(56, 189, 248, 0.1); }
 
-        /* گۆڕینی نیشانەی ئێستا لە دەوامە بۆ دەستە ڕاست */
+        /* نیشانەی ئێستا لە دەوامە لە دەستە ڕاست */
         .on-duty-badge {
             background: var(--success);
             color: white;
@@ -102,7 +102,7 @@
             border-radius: 10px;
             position: absolute;
             top: -9px;
-            right: 15px; /* بردنە سەرەوەی دەستە ڕاست */
+            right: 15px;
             box-shadow: 0 0 8px var(--success);
             font-weight: bold;
             white-space: nowrap;
@@ -195,10 +195,10 @@
             let index = diff % 8; if (index < 0) index += 8;
             let raw = rotation[index][group];
             let color = "off", text = raw;
-            if (raw === "07:00-03:00") { text = "٠٧:٠٠ بەیانی - ٠٣:٠٠ ئێوارە"; color = "day"; }
-            else if (raw === "03:00-11:00") { text = "٠٣:٠٠ ئێوارە - ١١:٠٠ شەو"; color = "evening"; }
-            else if (raw === "11:00-07:00") { text = "١١:٠٠ شەو - ٠٧:٠٠ بەیانی"; color = "night"; }
-            else if (raw === "OFF 24") { text = "پشووی ٢٤ کاتژمێری"; color = "off"; }
+            if (raw === "07:00-03:00") { text = "07:00 بەیانی - 03:00 ئێوارە"; color = "day"; }
+            else if (raw === "03:00-11:00") { text = "03:00 ئێوارە - 11:00 شەو"; color = "evening"; }
+            else if (raw === "11:00-07:00") { text = "11:00 شەو - 07:00 بەیانی"; color = "night"; }
+            else if (raw === "OFF 24") { text = "پشووی 24 کاتژمێری"; color = "off"; }
             else if (raw === "OFF") { text = "پشوو"; color = "off"; }
             return { text, color, raw };
         }
@@ -220,7 +220,12 @@
             const dateInput = document.getElementById("date");
             const selectedDate = new Date(dateInput.value);
             if (isNaN(selectedDate)) return;
-            document.getElementById("res-date").innerText = kurdishDays[selectedDate.getDay()] + " " + selectedDate.toLocaleDateString('ku-IQ');
+            
+            // پیشاندانی ڕێکەوتی سەرەوە بە ژمارەی ئینگلیزی
+            let options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            let formattedDate = selectedDate.toLocaleDateString('en-US', options);
+            document.getElementById("res-date").innerText = kurdishDays[selectedDate.getDay()] + " " + formattedDate;
+            
             const allGroupsDiv = document.getElementById("allGroups");
             allGroupsDiv.innerHTML = "";
             ["A", "B", "C", "D"].forEach(g => {
